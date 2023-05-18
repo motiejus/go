@@ -1113,6 +1113,14 @@ func (t *tester) internalLink() bool {
 		// linkmode=internal isn't supported.
 		return false
 	}
+
+	// internal linkmode does not always work with zig-cc due to Golang's implicit
+	// dependency on gcc_s. See issue 59735.
+	b := os.Getenv("GO_BUILDER_NAME")
+	if strings.HasPrefix(b, "linux-") && strings.HasSuffix(b, "-zig-cc") {
+		return false
+	}
+
 	return true
 }
 

@@ -12,6 +12,7 @@ import (
 	"flag"
 	"fmt"
 	"go/build"
+	"internal/testenv"
 	"io"
 	"log"
 	"os"
@@ -682,6 +683,11 @@ func TestNotes(t *testing.T) {
 // runtime, another package (dep2) that links against the first, and an
 // executable that links against dep2.
 func TestTwoGopathShlibs(t *testing.T) {
+	// -buildmode=shared is to be removed (#47788). Does not work with linux zig-cc.
+	b := testenv.Builder()
+	if strings.HasPrefix(b, "linux-") && strings.HasSuffix(b, "-zig-cc") {
+		t.Skipf("skipping on linux zig-cc")
+	}
 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./depBase")
 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./dep2")
 	goCmd(t, "install", "-linkshared", "./exe2")
@@ -689,6 +695,11 @@ func TestTwoGopathShlibs(t *testing.T) {
 }
 
 func TestThreeGopathShlibs(t *testing.T) {
+	// -buildmode=shared is to be removed (#47788). Does not work with linux zig-cc.
+	b := testenv.Builder()
+	if strings.HasPrefix(b, "linux-") && strings.HasSuffix(b, "-zig-cc") {
+		t.Skipf("skipping on linux zig-cc")
+	}
 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./depBase")
 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./dep2")
 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./dep3")
@@ -1085,6 +1096,11 @@ func TestPackageOrder(t *testing.T) {
 // Test that GC data are generated correctly by the linker when it needs a type defined in
 // a shared library. See issue 39927.
 func TestGCData(t *testing.T) {
+	// -buildmode=shared is to be removed (#47788). Does not work with linux zig-cc.
+	b := testenv.Builder()
+	if strings.HasPrefix(b, "linux-") && strings.HasSuffix(b, "-zig-cc") {
+		t.Skipf("skipping on linux zig-cc")
+	}
 	goCmd(t, "install", "-buildmode=shared", "-linkshared", "./gcdata/p")
 	goCmd(t, "build", "-linkshared", "./gcdata/main")
 	runWithEnv(t, "running gcdata/main", []string{"GODEBUG=clobberfree=1"}, "./main")
